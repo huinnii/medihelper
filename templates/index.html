@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>MEDI HELPER</title>
+
+    <style>
+        * {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+
+        :root {
+            --nav-height: 50px;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .wrap {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav {
+            display: flex;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: lightblue;
+        }
+
+        .logo {
+            font-size: 35px;
+            color: white;
+            margin: auto;
+        }
+
+        .main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /*row 방향*/
+            align-content: flex-start; /*row 수직방향*/
+            width: 100%;
+            height: calc(100% - var(--nav-height));
+        }
+
+        .descript-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /*row 방향*/
+            align-items: flex-start;
+            width: 500px;
+            height: 300px;
+            margin: auto 10px;
+        }
+
+        .description {
+            margin: 20px;
+            font-family: 'Hi Melody', cursive;
+            width: 400px;
+            font-size: 35px;
+        }
+
+        .button {
+            flex: 1;
+            width: 100px;
+            height: 30px;
+            margin: 0px 50px;
+        }
+
+        .back {
+            background-image: url('../static/ph_img.jpg');
+            background-position: center;
+            background-size: cover;
+            width: 500px;
+            height: 500px;
+            margin: 50px 30px;
+            opacity: 0.5;
+            /*border-radius: 150px;*/ /*round 경계*/
+        }
+    </style>
+
+    <script>
+
+        $(document).ready(function showExchangeInfo() {
+            $("#data-box").html(""); //empty
+        });
+
+        function Load_Pharmacy() {
+            window.location.href = "/search_pharmacy";
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+<div class="wrap">
+    <div class="nav">
+        <div class="logo">
+            MEDI HELPER
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="back">
+
+        </div>
+        <div class="descript-box">
+
+            <div class="description">
+                약국 검색 서비스 <br>
+                MEDI HELPER 입니다. <br>
+                <span style="font-size: 25px; font-family: 'Hi Melody', cursive;">지역명으로 주변 약국을 검색해보세요!</span>
+            </div>
+            <div class="button">
+                <button type="button" class="btn btn-outline-primary" onclick="Load_Pharmacy()">약국
+                    찾기 >
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+
+</html>

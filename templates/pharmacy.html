@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>MEDI HELPER</title>
+
+    <style>
+        * {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+
+        :root {
+            --nav-height: 50px;
+        }
+
+        .wrap {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav {
+            display: flex;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: lightblue;
+        }
+
+        .input-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 400px;
+            height: 10px;
+            margin: 30px auto;
+        }
+
+        #ph_list {
+            margin: auto 60px;
+        }
+
+        .table {
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            text-align: center
+        }
+
+        .clickable {
+            cursor: pointer;
+        }
+
+        .active {
+            width: 10px;
+            height: 10px;
+            background: dodgerblue;
+            color: white;
+        }
+
+        #map {
+            display: flex;
+            justify-content: center;
+            height: 400px;
+        }
+
+        #loading {
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            position: fixed;
+            display: block;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 100;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 47.5%;
+            left: 47.5%;
+            z-index: 100;
+        }
+
+        #logo {
+            font-size: 35px;
+            color: white;
+            margin: auto;
+        }
+
+        #pagination {
+            display: flex;
+            justify-content: center;
+        }
+
+        .page_num {
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+
+    </style>
+
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=180040a857d3871b5b6f57c8003dd20a"></script>
+    <script>
+
+        $(document).ready(function showExchangeInfo() {
+            $('#loading').hide();
+            $("#ph_list").hide();
+            categoryChange();
+        });
+
+        function getInfoByPage(area, req_page) {
+            $('#loading').show();
+
+            $.ajax({
+                type: "POST",
+                url: "/page",
+                data: {
+                    'area': area,
+                    'page': req_page
+                },
+                success: function (response) {
+                    $('#data-box').empty();
+
+                    let list = response['data']
+
+                    let x = list[0]['x'];
+                    let y = list[0]['y'];
+
+                    for (let i = 0; i < list.length; i++) {
+                        let data = list[i]
+                        let place = data['place_name']
+                        let address = data['address_name']
+                        let phone = data['phone']
+                        let url = data['place_url']
+
+                        let temp = `<tr>
+                                            <td><a href="${url}" target="_blank">${place}</td>
+                                            <td>${address}</td>
+                                            <td>${phone}</td>
+                                        </tr>`
+
+                        $('#data-box').append(temp)
+
+                        $('#loading').hide();
+                    }
+
+                    Map(x, y, list);
+                },
+                error: function () {
+                    $('#loading').hide();
+                    alert("정보를 받아오지 못했습니다");
+                }
+            })
+        }
+
+        //만들어진 테이블에 페이지 처리
+        function Pagination(total, area) {
+
+            $("#data-box").empty(); //empty
+            $("#remo").empty();
+
+            var $table = $("#ph_table");
+
+            $('table.paginated').each(function () {
+
+                var pagesu = 10;  //페이지 번호 갯수
+                var currentPage = 0;
+                var numPerPage = 15;  //목록의 수
+
+                //length로 원래 리스트의 전체길이구함
+                //var numRows = $table.find('tbody tr').length;
+                var numRows = total;
+                //Math.ceil를 이용하여 반올림
+                var numPages = Math.ceil(numRows / numPerPage);
+                //리스트가 없으면 종료
+                if (numPages == 0) return;
+                //pager라는 클래스의 div엘리먼트 작성
+                var $pager = $('<td align="center" id="remo" colspan="10"><div class="pager"></div></td>');
+
+                var nowp = currentPage;
+                var endp = nowp + 10;
+
+                //페이지를 클릭하면 다시 셋팅
+                $table.bind('repaginate', function () {
+
+                    $('#loading').show();
+
+                    let req_page = currentPage + 1;
+
+                    getInfoByPage(area, req_page);
+
+                    //기본적으로 모두 감춘다, 현재페이지+1 곱하기 현재페이지까지 보여준다
+                    //$table.find('tbody tr').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+
+                    $("#remo").html("");
+
+                    if (numPages > 1) {     // 한페이지 이상이면
+                        if (currentPage < 5 && numPages - currentPage >= 5) {   // 현재 5p 이하이면
+                            nowp = 0;     // 1부터
+                            endp = pagesu;    // 10까지
+                        } else {
+                            nowp = currentPage - 5;  // 6넘어가면 2부터 찍고
+                            endp = nowp + pagesu;   // 10까지
+                            pi = 1;
+                        }
+
+                        if (numPages < endp) {   // 10페이지가 안되면
+                            endp = numPages;   // 마지막페이지를 갯수 만큼
+                            nowp = numPages - pagesu;  // 시작페이지를   갯수 -10
+                        }
+                        if (nowp < 1) {     // 시작이 음수 or 0 이면
+                            nowp = 0;     // 1페이지부터 시작
+                        }
+                    } else {       // 한페이지 이하이면
+                        nowp = 0;      // 한번만 페이징 생성
+                        endp = numPages;
+                    }
+
+                    // [처음]
+                    $('<br /><span class="page-number" cursor: "pointer"><<</span>').bind('click', {newPage: page}, function (event) {
+                        currentPage = 0;
+                        $table.trigger('repaginate');
+                        $($(".page-number")[2]).addClass('active').siblings().removeClass('active');
+                    }).appendTo($pager).addClass('clickable');
+                    // [이전]
+                    $('<span class="page-number" cursor: "pointer">&nbsp;&nbsp;&nbsp;<&nbsp;</span>').bind('click', {newPage: page}, function (event) {
+                        if (currentPage == 0) return;
+                        currentPage = currentPage - 1;
+                        $table.trigger('repaginate');
+                        $($(".page-number")[(currentPage - nowp) + 2]).addClass('active').siblings().removeClass('active');
+                    }).appendTo($pager).addClass('clickable');
+                    // [1,2,3,4,5,6,7,8]
+                    for (var page = nowp; page < endp; page++) {
+                        $('<span class="page-number" cursor: "pointer" style="margin-left: 8px;"></span>').text(page + 1).bind('click', {newPage: page}, function (event) {
+                            currentPage = event.data['newPage'];
+                            $table.trigger('repaginate');
+                            $($(".page-number")[(currentPage - nowp) + 2]).addClass('active').siblings().removeClass('active');
+                        }).appendTo($pager).addClass('clickable');
+                    }
+                    // [다음]
+                    $('<span class="page-number" cursor: "pointer">&nbsp;&nbsp;&nbsp;>&nbsp;</span>').bind('click', {newPage: page}, function (event) {
+                        if (currentPage == numPages - 1) return;
+                        currentPage = currentPage + 1;
+                        $table.trigger('repaginate');
+                        $($(".page-number")[(currentPage - nowp) + 2]).addClass('active').siblings().removeClass('active');
+                    }).appendTo($pager).addClass('clickable');
+                    // [끝]
+                    $('<span class="page-number" cursor: "pointer">&nbsp;>></span>').bind('click', {newPage: page}, function (event) {
+                        currentPage = numPages - 1;
+                        $table.trigger('repaginate');
+                        $($(".page-number")[endp - nowp + 1]).addClass('active').siblings().removeClass('active');
+                    }).appendTo($pager).addClass('clickable');
+
+                    $($(".page-number")[2]).addClass('active');
+
+                });
+
+                $pager.insertAfter($table).find('span.page-number:first').next().next().addClass('active');
+                $("#remo").remove();
+                $pager.appendTo($table);
+                $table.trigger('repaginate');
+            });
+        }
+
+        function Map(x, y, positions) {
+            var container = document.getElementById('map');
+            var options = {
+                center: new kakao.maps.LatLng(y, x),
+                level: 3
+            };
+
+            var map = new kakao.maps.Map(container, options);
+
+            for (var i = 0; i < positions.length; i++) {
+
+                // 마커 이미지의 이미지 크기 입니다
+                var imageSize = new kakao.maps.Size(24, 35);
+
+                let title = positions[i].place_name;
+                let latx = positions[i].x;
+                let laty = positions[i].y;
+
+                let latlng = new kakao.maps.LatLng(laty, latx);
+
+                // 마커 이미지를 생성합니다
+                //var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
+                // 마커를 생성합니다
+                var marker = new kakao.maps.Marker({
+                    map: map, // 마커를 표시할 지도
+                    position: latlng, // 마커를 표시할 위치
+                    title: title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+                    clickable: true
+                    //image: markerImage // 마커 이미지
+                });
+
+            }
+        }
+
+        function Search() {
+            $("#data-box").empty(); //empty
+            $("#ph_list").hide();
+
+            let sido = $selsido.val();
+            let gugun = $selsido.next().val();
+            let jiboen = $('#area').val();
+
+            if (sido === "시/도 선택")
+                alert("시/도를 선택해주세요")
+
+            else if (jiboen === "") {
+                alert("지번을 입력해주세요")
+                $('#area').focus();
+            } else {
+                let area = sido + gugun + jiboen;
+
+                $('#loading').show();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/place",
+                    data: {
+                        'area': area,
+                    },
+                    success: function (response) {
+
+                        let total = response['total']
+                        // 배운 코드
+                        //Page(total, 15, area)
+                        //getInfoByPage(area, 1)
+                        // 이전 코드
+                        $("#ph_table").unbind();
+                        Pagination(total, area);
+
+                        $('#loading').hide();
+                        $("#ph_list").show();
+                    },
+                    error: function () {
+                        $('#loading').hide();
+                        alert("정보를 받아오지 못했습니다");
+                    }
+                })
+            }
+        }
+
+        function Page(total, size, area) {
+
+            $("#pagination").empty();
+
+            let before = `<a class="page_num" onclick="" )"><</a>`;
+
+            $("#pagination").append(before);
+
+            let total_page = parseInt(total / size);
+
+            for (let i = 0; i < total_page; i++) {
+                let temp = `<a class="page_num" onclick="getInfoByPage('${area}','${i + 1}')">${i + 1}</a>`;
+
+                $("#pagination").append(temp);
+            }
+
+            let after = `<a class="page_num" )">></a>`;
+
+            $("#pagination").append(after);
+        }
+
+        function categoryChange() {
+            var area0 = ["시/도 선택", "서울특별시", "인천광역시", "대전광역시", "광주광역시", "대구광역시", "울산광역시", "부산광역시", "경기도", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도", "제주도"];
+            var area1 = ["강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구", "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구", "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"];
+            var area2 = ["계양구", "남구", "남동구", "동구", "부평구", "서구", "연수구", "중구", "강화군", "옹진군"];
+            var area3 = ["대덕구", "동구", "서구", "유성구", "중구"];
+            var area4 = ["광산구", "남구", "동구", "북구", "서구"];
+            var area5 = ["남구", "달서구", "동구", "북구", "서구", "수성구", "중구", "달성군"];
+            var area6 = ["남구", "동구", "북구", "중구", "울주군"];
+            var area7 = ["강서구", "금정구", "남구", "동구", "동래구", "부산진구", "북구", "사상구", "사하구", "서구", "수영구", "연제구", "영도구", "중구", "해운대구", "기장군"];
+            var area8 = ["고양시", "과천시", "광명시", "광주시", "구리시", "군포시", "김포시", "남양주시", "동두천시", "부천시", "성남시", "수원시", "시흥시", "안산시", "안성시", "안양시", "양주시", "오산시", "용인시", "의왕시", "의정부시", "이천시", "파주시", "평택시", "포천시", "하남시", "화성시", "가평군", "양평군", "여주군", "연천군"];
+            var area9 = ["강릉시", "동해시", "삼척시", "속초시", "원주시", "춘천시", "태백시", "고성군", "양구군", "양양군", "영월군", "인제군", "정선군", "철원군", "평창군", "홍천군", "화천군", "횡성군"];
+            var area10 = ["제천시", "청주시", "충주시", "괴산군", "단양군", "보은군", "영동군", "옥천군", "음성군", "증평군", "진천군", "청원군"];
+            var area11 = ["계룡시", "공주시", "논산시", "보령시", "서산시", "아산시", "천안시", "금산군", "당진군", "부여군", "서천군", "연기군", "예산군", "청양군", "태안군", "홍성군"];
+            var area12 = ["군산시", "김제시", "남원시", "익산시", "전주시", "정읍시", "고창군", "무주군", "부안군", "순창군", "완주군", "임실군", "장수군", "진안군"];
+            var area13 = ["광양시", "나주시", "목포시", "순천시", "여수시", "강진군", "고흥군", "곡성군", "구례군", "담양군", "무안군", "보성군", "신안군", "영광군", "영암군", "완도군", "장성군", "장흥군", "진도군", "함평군", "해남군", "화순군"];
+            var area14 = ["경산시", "경주시", "구미시", "김천시", "문경시", "상주시", "안동시", "영주시", "영천시", "포항시", "고령군", "군위군", "봉화군", "성주군", "영덕군", "영양군", "예천군", "울릉군", "울진군", "의성군", "청도군", "청송군", "칠곡군"];
+            var area15 = ["거제시", "김해시", "마산시", "밀양시", "사천시", "양산시", "진주시", "진해시", "창원시", "통영시", "거창군", "고성군", "남해군", "산청군", "의령군", "창녕군", "하동군", "함안군", "함양군", "합천군"];
+            var area16 = ["서귀포시", "제주시", "남제주군", "북제주군"];
+
+
+            // 시/도 선택 박스 초기화
+
+            $("select[name^=sido]").each(function () {
+                $selsido = $(this);
+                $.each(eval(area0), function () {
+                    $selsido.append("<option value='" + this + "'>" + this + "</option>");
+                });
+                $selsido.next().append("<option value=''>구/군 선택</option>");
+            });
+
+            // 시/도 선택시 구/군 설정
+
+            $("select[name^=sido]").change(function () {
+                var area = "area" + $("option", $(this)).index($("option:selected", $(this))); // 선택지역의 구군 Array
+                var $gugun = $(this).next(); // 선택영역 군구 객체
+                $("option", $gugun).remove(); // 구군 초기화
+
+                if (area == "area0")
+                    $gugun.append("<option value=''>구/군 선택</option>");
+                else {
+                    $.each(eval(area), function () {
+                        $gugun.append("<option value='" + this + "'>" + this + "</option>");
+                    });
+                }
+            });
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+<div class="wrap">
+    <div class="nav">
+        <div id="logo">
+            MEDI HELPER
+        </div>
+    </div>
+    <div class="input-box">
+        <div class="input-group mb-3">
+            <select name="sido1" id="sido1"></select>
+            <select name="gugun1" id="gugun1"></select>
+            <input type="text" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default"
+                   id="area">
+            <button type="button" class="btn btn-primary" onclick="Search()">찾기</button>
+        </div>
+    </div>
+
+    <div id="loading"><img id="loading-image" src="/static/Spinner.gif" alt="Loading..."/></div>
+
+    <div id="ph_list">
+        <h3>위치🙂</h3>
+
+        <div id="map">
+        </div>
+
+        <table id="ph_table" class="table paginated">
+            <thead>
+            <tr>
+                <th scope="col">상호명</th>
+                <th scope="col">주소</th>
+                <th scope="col">전화번호</th>
+            </tr>
+            </thead>
+
+            <tbody id="data-box">
+            </tbody>
+        </table>
+        <div id="pagination">
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+</html>
