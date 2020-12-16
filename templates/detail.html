@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <title>MEDI HELPER</title>
+
+    <style>
+        * {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+
+        :root {
+            --nav-height: 50px;
+        }
+
+        .wrap {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .nav {
+            display: flex;
+            width: 100%;
+            height: var(--nav-height);
+            background-color: lightblue;
+        }
+
+        #detail_info {
+            margin: 60px;
+        }
+
+        #loading {
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            position: fixed;
+            display: block;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 100;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 47.5%;
+            left: 47.5%;
+            z-index: 100;
+        }
+
+        #logo {
+            cursor: pointer;
+            font-size: 35px;
+            color: white;
+            margin: auto;
+        }
+
+        #comment {
+            width: 100%;
+            font-size: 25px;
+            text-align: center;
+            margin: 15px auto;
+            color: lightblue;
+        }
+
+    </style>
+
+    <script>
+
+        $(document).ready(function showExchangeInfo() {
+            $('#loading').hide();
+        });
+
+         function Load_Main() {
+            window.location.href = "/";
+        }
+
+        function openClose() {
+            // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
+            if ($("#nb-box").css("display") === "block") {
+                // post-box를 가리고
+                $("#nb-box").hide();
+                // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+                $("#btn_nb").text("▼");
+            } else {
+                // 아니면(눈에 보이지 않으면) post-box를 펴라
+                $("#nb-box").show();
+                // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+                $("#btn_nb").text("▲");
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+
+<div class="wrap">
+    <div class="nav">
+        <div id="logo" onclick="Load_Main()">
+            MEDI HELPER
+        </div>
+        <div id="comment">
+            [ 의약품 상세정보 ]
+        </div>
+    </div>
+
+    <div id="loading"><img id="loading-image" src="/static/Spinner.gif" alt="Loading..."/></div>
+
+    <div id="detail_info">
+
+        <h2 style="color: lightblue">품목명</h2>
+            <h5>{{data['item_name']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">업체명</h2>
+            <h5>{{data['entp_name']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">성상</h2>
+            <h5>{{data['chart']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">저장방법</h2>
+            <h5>{{data['storage_method']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">유효기간</h2>
+            <h5>{{data['valid_term']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">효능효과</h2>
+            <h5>{{data['ee_doc_data']}}</h5>
+                <hr>
+
+        <h2 style="color: lightblue">용법용량</h2>
+            <h5>{{data['ud_doc_data']}}</h5>
+                <hr>
+
+         <h2 style="color: lightblue">주의사항 <a id="btn_nb" style="cursor: pointer" onclick="openClose()">▼</a> </h2>
+            <h5 id="nb-box" style="display:none">{{data['nb_doc_data']}}</h5>
+                <hr>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

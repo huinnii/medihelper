@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- font -->
     <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap" rel="stylesheet">
@@ -55,6 +56,7 @@
         }
 
         .logo {
+            cursor: pointer;
             font-size: 35px;
             color: white;
             margin: auto;
@@ -69,40 +71,80 @@
             height: calc(100% - var(--nav-height));
         }
 
-        .descript-box {
+        .description {
+            margin-top: 50px;
+            width: 100%;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .btn5 {
+            cursor: pointer;
             display: flex;
             flex-wrap: wrap;
             justify-content: center; /*row 방향*/
-            align-items: flex-start;
-            width: 500px;
-            height: 300px;
-            margin: auto 10px;
+            align-items: center;
+            margin: 80px 30px;
+            width: 40%;
+            height: 60%;
+            font-size: 30px;
+            position: relative;
+            z-index: 1;
         }
 
-        .description {
-            margin: 20px;
-            font-family: 'Hi Melody', cursive;
-            width: 400px;
-            font-size: 35px;
+        /*#ph_btn:before {*/
+        /*    background-position: center;*/
+        /*    background-size: cover;*/
+        /*    background-image: url('../static/store_img.jpg');*/
+        /*}*/
+
+        .btn5::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: black;
+            -webkit-transform: scaleX(.3);
+            transform: scaleX(.3);
+            opacity: 0;
+            transition: all .3s
         }
 
-        .button {
-            flex: 1;
-            width: 100px;
-            height: 30px;
-            margin: 0px 50px;
+        .btn5:hover::before {
+            opacity: 0.5;
+            -webkit-transform: scaleX(1);
+            transform: scaleX(1);
+            transition: -webkit-transform .6s cubic-bezier(.08, .35, .13, 1.02), opacity .4s;
+            transition: transform .6s cubic-bezier(.08, .35, .13, 1.02), opacity
         }
 
-        .back {
-            background-image: url('../static/ph_img.jpg');
+        /*#ph_btn::after {*/
+        /*    width: 100%;*/
+        /*    height: 100%;*/
+        /*    content: "";*/
+        /*    background-position: center;*/
+        /*    background-size: cover;*/
+        /*    background-image: url('../static/store_img.jpg');*/
+        /*    position: absolute;*/
+        /*    z-index: -1;*/
+        /*    opacity: 0.5;*/
+        /*}*/
+        #ph_btn {
             background-position: center;
             background-size: cover;
-            width: 500px;
-            height: 500px;
-            margin: 50px 30px;
-            opacity: 0.5;
-            /*border-radius: 150px;*/ /*round 경계*/
+            background-image: url('../static/store_img.jpg');
         }
+
+        #mc_btn {
+            background-position: center;
+            background-size: cover;
+            background-image: url('../static/drug.jpg');
+        }
+
     </style>
 
     <script>
@@ -111,8 +153,16 @@
             $("#data-box").html(""); //empty
         });
 
+        function Load_Main() {
+            window.location.href = "/";
+        }
+
         function Load_Pharmacy() {
             window.location.href = "/search_pharmacy";
+        }
+
+        function Load_Medicine() {
+            window.location.href = "/search_medicine";
         }
 
     </script>
@@ -123,32 +173,18 @@
 
 <div class="wrap">
     <div class="nav">
-        <div class="logo">
+        <div class="logo" onclick="Load_Main()">
             MEDI HELPER
         </div>
     </div>
 
+    <div class="description">약국/의약품 검색 서비스 MEDI HELPER 입니다.</div>
+
     <div class="main">
-        <div class="back">
-
-        </div>
-        <div class="descript-box">
-
-            <div class="description">
-                약국 검색 서비스 <br>
-                MEDI HELPER 입니다. <br>
-                <span style="font-size: 25px; font-family: 'Hi Melody', cursive;">지역명으로 주변 약국을 검색해보세요!</span>
-            </div>
-            <div class="button">
-                <button type="button" class="btn btn-outline-primary" onclick="Load_Pharmacy()">약국
-                    찾기 >
-                </button>
-            </div>
-        </div>
+        <div class="btn5" id="ph_btn" style="color: white;" onclick="Load_Pharmacy()"><a id="ph_title">약국 찾기</a></div>
+        <div class="btn5" id="mc_btn" style="color: white;" onclick="Load_Medicine()"><a id="mc_title">의약품 찾기</a></div>
     </div>
 </div>
 
-
 </body>
-
 </html>
