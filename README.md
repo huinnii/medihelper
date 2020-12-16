@@ -1,2 +1,2 @@
 # MEDI HELPER
-## Pharmacy Search Service
+## Pharmacy & Medicine Search Service
