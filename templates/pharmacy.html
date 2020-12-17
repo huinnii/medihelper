@@ -350,19 +350,19 @@
             $("#data-box").empty(); //empty
             $("#result").empty();
             $("#ph_list").hide();
-            $("#init_comment").hide();
 
             let sido = $selsido.val();
             let gugun = $selsido.next().val();
             let jiboen = $('#area').val();
 
-            if (sido === "시/도 선택")
+            if (sido === "시/도 선택") {
                 alert("시/도를 선택해주세요")
-
-            else if (jiboen === "") {
+            } else if (jiboen === "") {
                 alert("지번을 입력해주세요")
                 $('#area').focus();
             } else {
+                $("#init_comment").hide();
+
                 let area = sido + gugun + jiboen;
 
                 $('#loading').show();
@@ -478,7 +478,7 @@
         <div id="logo" onclick="Load_Main()">
             MEDI HELPER
         </div>
-         <div id="comment">
+        <div id="comment">
             [ 약국 찾기 ]
         </div>
     </div>

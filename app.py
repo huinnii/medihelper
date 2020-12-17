@@ -145,7 +145,7 @@ def get_detail(id):
         'nb_doc_data': nb_doc_data
     }
 
-    print(doc)
+    #print(doc)
 
     return render_template('detail.html', data=doc)
 
@@ -165,6 +165,8 @@ def search_medicine():
 
     url = 'http://apis.data.go.kr/1471057/MdcinPrductPrmisnInfoService/getMdcinPrductItem'
 
+    init_page=1
+
     if option == '품목명':
         queryParams = '?' + urlencode(
             {
@@ -172,7 +174,7 @@ def search_medicine():
                 quote_plus('item_name'): word,
                 quote_plus('induty'): '의약품',
                 quote_plus('spclty_pblc'): '전문의약품',
-                quote_plus('pageNo'): '1',
+                quote_plus('pageNo'): init_page,
                 quote_plus('numOfRows'): perPage_list
             })
 
@@ -183,7 +185,7 @@ def search_medicine():
                 quote_plus('entp_name'): word,
                 quote_plus('induty'): '의약품',
                 quote_plus('spclty_pblc'): '전문의약품',
-                quote_plus('pageNo'): '1',
+                quote_plus('pageNo'): init_page,
                 quote_plus('numOfRows'): perPage_list
             })
 
@@ -216,7 +218,7 @@ def search_medicine():
 
         datas.append(doc)
 
-    print(datas)
+    #print(datas)
 
     return jsonify({'result': 'success', 'data': datas, 'total': total})
 

@@ -189,23 +189,6 @@
             })
         }
 
-        function Show_Detail(item_seq) {
-            $.ajax({
-                type: "POST",
-                url: "/detail/" + item_seq,
-                data: {
-                    'item_seq': item_seq
-                },
-                success: function (response) {
-
-                },
-                error: function () {
-                    $('#loading').hide();
-                    $("#init_comment").show();
-                }
-            })
-        }
-
         //만들어진 테이블에 페이지 처리
         function Pagination(total, area, option) {
 
@@ -320,8 +303,6 @@
             $("#result").empty();
             $("#mc_list").hide();
 
-            $("#init_comment").hide();
-
             let option = $selopt.val();
             let keyword = $('#keyword').val();
 
@@ -337,7 +318,7 @@
                 $("#init_comment").show();
 
             } else {
-
+                $("#init_comment").hide();
                 $('#loading').show();
 
                 $.ajax({
